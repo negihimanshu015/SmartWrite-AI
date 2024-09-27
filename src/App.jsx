@@ -1,8 +1,10 @@
 import "./bulma.css";
 import logo from "./assets/lg.png";
+import { useContext } from "react";
+import { Context } from "./context/context";
 
 function App() {
-  
+  const {onsent,Input,setInput,Result,setResult,ShowResult,setShowResult} = useContext(Context);  
   
   return (
     <div className="section my-6">
@@ -26,12 +28,13 @@ function App() {
                 className="input p-3 m-3"
                 type="text"
                 placeholder="Topic"
+                onChange={(e) =>setInput(e.target.value)}
               />
-              <textarea
-                className="textarea is-large p-3 m-3"
-                placeholder=""
-              ></textarea>
-              <button className="button is-black p-3 m-3">Generate</button>
+              {!ShowResult
+              ? <></>              
+            :<div>
+              <p>Hello d</p></div>}
+              <button className="button is-black p-3 m-3" onClick={() => onsent()}>Generate</button>
               <button className="button is-black p-3 m-3">Post</button>
             </div>
           </div>
