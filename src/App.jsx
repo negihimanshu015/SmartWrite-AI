@@ -2,6 +2,8 @@ import "./bulma.css";
 import logo from "./assets/lg.png";
 
 function App() {
+  
+  
   return (
     <div className="section my-6">
       <div className="card my-6 ">
@@ -10,7 +12,7 @@ function App() {
             <div className="column">
               <div className="column is-narrow">
                 <div className="column p-1">
-                  <figure class="image is-128x128 container">
+                  <figure className="image is-128x128 container">
                     <img src={logo} className="is-rounded" />
                   </figure>
                   <div className="column">
