@@ -4,32 +4,53 @@ import run from "../api/api";
 export const Context = createContext();
 
 const ContextProvider = (props) => {
+  const [Input, setInput] = useState("");
+  const [Result, setResult] = useState("");
+  const [ShowResult, setShowResult] = useState(false);
 
-    const onsent = async (prompt) => {
-        setResult("")
-        setShowResult(true)
-        const response = await run(Input)
-        setResult(response)
-        setInput("")        
+  const onsent = async () => {
+    setShowResult(false);  
+    setResult("");            
+
+    try {
+      const response = await run(Input);      
+      let responseArray = response.split("**");
+      let newResponse = "";
+      for(let i =0 ; i < responseArray.length; i++)
+        {
+            if (i === 0 || i%2 !== 1) { 
+                newResponse += responseArray[i];
+            }
+            else{
+                newResponse += "<b>" + responseArray[i] + "</b>";
+            }
+        }
+      let fianlResponse = newResponse.split("*").join("</br>");
+      setResult(fianlResponse);                
+      setShowResult(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setResult("An error occurred. Please try again.");
+      setShowResult(true);               
     }
+    setInput("");                         
+  };
 
-    const [Input,setInput] = useState("");
-    const [Result,setResult] = useState("");
-    const [ShowResult,setShowResult] = useState(false);
-    
-    const ContextValue = {
-        onsent,
-        Input,
-        setInput,
-        Result,
-        setResult
-    }
+  const ContextValue = {
+    onsent,
+    Input,
+    setInput,
+    Result,
+    setResult,
+    ShowResult,
+    setShowResult,
+  };
 
-    return(
-        <Context.Provider value={ContextValue}>
-            {props.children}
-        </Context.Provider>
-    )
- }
+  return (
+    <Context.Provider value={ContextValue}>
+      {props.children}
+    </Context.Provider>
+  );
+};
 
- export default ContextProvider
+export default ContextProvider;

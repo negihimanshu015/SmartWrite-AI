@@ -4,7 +4,15 @@ import { useContext } from "react";
 import { Context } from "./context/context";
 
 function App() {
-  const {onsent,Input,setInput,Result,setResult,ShowResult,setShowResult} = useContext(Context);  
+  const {onsent,Input,setInput,Result,setResult,ShowResult,setShowResult} = useContext(Context);
+
+  const handleGenerate = async () => {
+    setShowResult(false);  // Hide the result before fetching new data
+    const response = await onsent();  // Assuming onsent handles API call and returns the response
+    const data = await response.text();  // Extract text from the response
+    setResult(data);  // Store the result in the state
+    setShowResult(true);  // Show the result after it's fetched
+  };  
   
   return (
     <div className="section my-6">
@@ -29,13 +37,17 @@ function App() {
                 type="text"
                 placeholder="Topic"
                 onChange={(e) =>setInput(e.target.value)}
-              />
-              {!ShowResult
-              ? <></>              
-            :<div>
-              <p>Hello d</p></div>}
-              <button className="button is-black p-3 m-3" onClick={() => onsent()}>Generate</button>
+              />               
+             
+              <button className="button is-black p-3 m-3" onClick={handleGenerate}>Generate</button>
               <button className="button is-black p-3 m-3">Post</button>
+
+              {ShowResult && (
+                <div className="notification is-primary my-3">
+                  <h2 className="title is-4">AI Response</h2>
+                  <div dangerouslySetInnerHTML={{ __html: Result }} />
+                </div>
+              )}
             </div>
           </div>
         </div>
