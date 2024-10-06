@@ -36,7 +36,7 @@ To get started with the project, you will need to clone this repository and inst
 
 3. Install dependencies:
 
-    ```bash
+    ```
     npm install
     ```
 
