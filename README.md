@@ -24,13 +24,13 @@ To get started with the project, you will need to clone this repository and inst
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/react-smartwrite-plugin.git
+    git clone https://github.com/negihimanshu015/SmartWrite-AI.git
     ```
 
 2. Navigate to the project directory:
 
     ```bash
-    cd react-smartwrite-plugin
+    cd SmartWrite-AI
     ```
 
 3. Install dependencies:
