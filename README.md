@@ -40,17 +40,25 @@ To get started with the project, you will need to clone this repository and inst
     npm install
     ```
 
-## Project Structure
+## Building for Production
 
-Here is the overview of the project structure:
+To generate the production-ready version of the app, run the following command:
 
-```bash
-react-smartwrite-plugin/
-├── public/                # Static assets
-├── src/                   # Source files
-│   ├── components/        # React components
-│   ├── context/           # Context providers
-│   ├── App.js             # Main application file
-│   └── index.js           # Entry point for React
-├── package.json           # npm configuration and dependencies
-└── README.md              # Project documentation
+    ```bash
+    npm run build
+    ```
+This will create a build/ directory containing the minified files. The contents of this folder are what you will deploy to the production environment, such as a WordPress plugin.
+
+## Contributing
+
+If you'd like to contribute to this project, please fork the repository, create a new branch, and submit a pull request. We'd love your contributions!
+
+1. Fork the repo
+2. Create a new branch: git checkout -b feature-branch
+3. Commit your changes: git commit -m 'Add new feature'
+4. Push the branch: git push origin feature-branch
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
