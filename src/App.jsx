@@ -84,13 +84,13 @@ function App() {
                 />
 
                 <button
-                  className="button is-black p-3 m-3"
+                  className="gen"
                   onClick={handleGenerate}
                 >
                   Generate
                 </button>
                 <button
-                  className="button is-black p-3 m-3"
+                  className="gen"
                   onClick={handlePostToWordPress}
                 >
                   Post

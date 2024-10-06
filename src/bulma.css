@@ -21548,4 +21548,15 @@ has-background-danger.is-hoverable:active {
   pointer-events: all !important;
 }
 
+.gen {
+    background-color: black;
+  color: white;
+  padding: 1.1rem;
+  margin: 1.5rem;
+  border: none;  /* Removes any border, since Bulma buttons are borderless */
+  font-size: 1rem;  /* Adjust this as per Bulma's default size if needed */
+  border-radius: 4px;  /* Bulma buttons have a subtle border-radius */
+  cursor: pointer;  /* For the button effect */
+}
+
 /*# sourceMappingURL=bulma.css.map */

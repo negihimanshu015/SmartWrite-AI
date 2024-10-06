@@ -9,31 +9,32 @@ const ContextProvider = (props) => {
   const [ShowResult, setShowResult] = useState(false);
 
   const onsent = async () => {
-    setShowResult(false);  
-    setResult("");            
+    setShowResult(false);
+    setResult("");
 
     try {
-      const response = await run(Input);      
+      const response = await run(`write a blog on ${Input}`);
       let responseArray = response.split("**");
       let newResponse = "";
-      for(let i =0 ; i < responseArray.length; i++)
-        {
-            if (i === 0 || i%2 !== 1) { 
-                newResponse += responseArray[i];
-            }
-            else{
-                newResponse += "<b>" + responseArray[i] + "</b>";
-            }
+      for (let i = 0; i < responseArray.length; i++) {
+        if (i === 0 || i % 2 !== 1) {
+          newResponse += responseArray[i];
+        } else {
+          newResponse += "<b>" + responseArray[i] + "</b>";
         }
+      }
+
+      newResponse = newResponse.replace(/^##\s*/, "");
+
       let fianlResponse = newResponse.split("*").join("</br>");
-      setResult(fianlResponse);                
+      setResult(fianlResponse);
       setShowResult(true);
     } catch (error) {
       console.error("Error fetching data:", error);
       setResult("An error occurred. Please try again.");
-      setShowResult(true);               
+      setShowResult(true);
     }
-    setInput("");                         
+    setInput("");
   };
 
   const ContextValue = {
@@ -47,9 +48,7 @@ const ContextProvider = (props) => {
   };
 
   return (
-    <Context.Provider value={ContextValue}>
-      {props.children}
-    </Context.Provider>
+    <Context.Provider value={ContextValue}>{props.children}</Context.Provider>
   );
 };
 
