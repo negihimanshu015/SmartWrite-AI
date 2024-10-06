@@ -44,7 +44,7 @@ To get started with the project, you will need to clone this repository and inst
 
 To generate the production-ready version of the app, run the following command:
 
-    ```bash
+    ```
     npm run build
     ```
 This will create a build/ directory containing the minified files. The contents of this folder are what you will deploy to the production environment, such as a WordPress plugin.
