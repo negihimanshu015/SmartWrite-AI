@@ -5,7 +5,6 @@ This repository contains the source code for the **SmartWrite AI** project, a Re
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-- [Available Scripts](#available-scripts)
 - [Building for Production](#building-for-production)
 - [Contributing](#contributing)
 - [License](#license)
