@@ -1,14 +1,13 @@
-<?php
+ <?php
 /**
  * Plugin Name: SmartWrite AI
- * Description: SmartWrite AI is a powerful plugin designed to simplify content creation directly from your WordPress dashboard. It allows you to quickly generate blog posts and drafts using AI-generated content, perfect for writers and bloggers looking to speed up their workflow. With an intuitive React-based interface, SmartWrite AI integrates seamlessly into the WordPress admin, enabling you to generate ideas, create posts, and publish them with ease.
- * Version: 1.0
+ * Description: SmartWrite AI is a powerful plugin designed to simplify content creation directly from your WordPress dashboard. It also allows automatic internal linking based on user-defined keywords and URLs.
+ * Version: 2.0
  * Author: Himanshu Negi
  */
 
 // Enqueue React build files in the admin area
 function enqueue_admin_react_app($hook_suffix) {
-    // Check if the current admin page is the SmartWrite AI admin page
     if ($hook_suffix !== 'toplevel_page_smartwrite-ai') {
         return;
     }
@@ -40,6 +39,7 @@ function enqueue_admin_react_app($hook_suffix) {
         )
     );
 }
+add_action('admin_enqueue_scripts', 'enqueue_admin_react_app');
 
 // Add a custom menu to the WordPress admin sidebar for SmartWrite AI
 function smartwrite_admin_menu() {
@@ -50,14 +50,110 @@ function smartwrite_admin_menu() {
         'smartwrite-ai',            
         'smartwrite_admin_page',   
         'dashicons-welcome-write-blog', 
-        6                           
+        6
+    );
+    
+    // Add submenu for Internal Linking
+    add_submenu_page(
+        'smartwrite-ai',             
+        'Internal Linking Settings', // Page title
+        'Internal Linking',          // Menu title
+        'manage_options',            // Capability
+        'smartwrite_internal_linking',// Menu slug
+        'smartwrite_internal_linking_page' // Callback function
     );
 }
+add_action('admin_menu', 'smartwrite_admin_menu');
 
 // Function to render the React app in the custom admin page
 function smartwrite_admin_page() {   
     echo '<div id="root"></div>';
 }
+
+// Internal Linking Settings Page
+function smartwrite_internal_linking_page() {
+    ?>
+    <div class="wrap">
+        <h1>Internal Linking Settings</h1>
+        <form method="post" action="options.php">
+            <?php
+            settings_fields('smartwrite_linking_settings');
+            $keywords_urls = get_option('smartwrite_keywords_urls', array());
+
+            if (!empty($keywords_urls)) {
+                foreach ($keywords_urls as $index => $pair) {
+                    ?>
+                    <p>
+                        <input type="text" name="smartwrite_keywords_urls[<?php echo $index; ?>][keyword]" value="<?php echo esc_attr($pair['keyword']); ?>" placeholder="Keyword" />
+                        <input type="url" name="smartwrite_keywords_urls[<?php echo $index; ?>][url]" value="<?php echo esc_url($pair['url']); ?>" placeholder="URL" />
+                        <a href="#" class="remove-pair">Remove</a>
+                    </p>
+                    <?php
+                }
+            } else {
+                ?>
+                <p>
+                    <input type="text" name="smartwrite_keywords_urls[0][keyword]" placeholder="Keyword" />
+                    <input type="url" name="smartwrite_keywords_urls[0][url]" placeholder="URL" />
+                </p>
+                <?php
+            }
+            ?>
+            <div id="extra-pairs"></div>
+            <button type="button" id="add-pair">Add another pair</button>
+            <?php submit_button(); ?>
+        </form>
+    </div>
+    <script>
+        document.getElementById('add-pair').addEventListener('click', function(e) {
+            e.preventDefault();
+            var index = document.querySelectorAll('input[name^="smartwrite_keywords_urls"]').length / 2;
+            var div = document.createElement('div');
+            div.innerHTML = `
+                <p>
+                    <input type="text" name="smartwrite_keywords_urls[` + index + `][keyword]" placeholder="Keyword" />
+                    <input type="url" name="smartwrite_keywords_urls[` + index + `][url]" placeholder="URL" />
+                    <a href="#" class="remove-pair">Remove</a>
+                </p>
+            `;
+            document.getElementById('extra-pairs').appendChild(div);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-pair')) {
+                e.preventDefault();
+                e.target.parentElement.remove();
+            }
+        });
+    </script>
+    <?php
+}
+
+// Register settings for Internal Linking
+function smartwrite_register_settings() {
+    register_setting('smartwrite_linking_settings', 'smartwrite_keywords_urls');
+}
+add_action('admin_init', 'smartwrite_register_settings');
+
+// Apply internal linking to the content
+function smartwrite_apply_internal_linking($content) {
+    $keywords_urls = get_option('smartwrite_keywords_urls', array());
+
+    if (!empty($keywords_urls)) {
+        foreach ($keywords_urls as $pair) {
+            $keyword = esc_html($pair['keyword']);
+            $url = esc_url($pair['url']);
+
+            if (!empty($keyword) && !empty($url)) {
+                // Replace the first occurrence of the keyword with a link
+                $content = preg_replace('/(' . preg_quote($keyword, '/') . ')/i', '<a href="' . $url . '">$1</a>', $content, 1);
+            }
+        }
+    }
+
+    return $content;
+}
+add_filter('the_content', 'smartwrite_apply_internal_linking');
 
 // Register the custom REST API endpoint for creating posts
 function smartwrite_register_rest_route() {
@@ -65,10 +161,11 @@ function smartwrite_register_rest_route() {
         'methods' => 'POST',
         'callback' => 'smartwrite_create_post',
         'permission_callback' => function () {
-            return current_user_can('edit_posts'); 
+            return current_user_can('edit_posts');
         },
     ));
 }
+add_action('rest_api_init', 'smartwrite_register_rest_route');
 
 // Callback function for the REST API to create a new post
 function smartwrite_create_post(WP_REST_Request $request) {
@@ -86,7 +183,7 @@ function smartwrite_create_post(WP_REST_Request $request) {
     $post_id = wp_insert_post(array(
         'post_title'   => $title,
         'post_content' => $content,
-        'post_status'  => 'draft',  
+        'post_status'  => 'draft',
         'post_author'  => get_current_user_id(),
     ));
 
@@ -100,12 +197,3 @@ function smartwrite_create_post(WP_REST_Request $request) {
         'message' => 'Post created successfully!',
     ));
 }
-
-// Hook to register the REST API route when the REST API is initialized
-add_action('rest_api_init', 'smartwrite_register_rest_route');
-
-// Hook to enqueue the React app scripts and styles
-add_action('admin_enqueue_scripts', 'enqueue_admin_react_app');
-
-// Hook to add the custom SmartWrite AI menu
-add_action('admin_menu', 'smartwrite_admin_menu');
